@@ -233,3 +233,9 @@ fecha,campeonato,pista,piloto,equipo,posicion,puntos,tiempo
 2026-03-11T18:57:58Z,copa_verano,interna,leo,RANDOM,4,3,+1.848s
 2026-03-11T18:57:58Z,copa_verano,interna,jony,INFRA,5,2,+2.370s
 2026-03-11T18:57:58Z,copa_verano,interna,juan,RANDOM,6,1,+2.624s
+2026-03-12T21:26:18Z,demo,ovalo,carlos,QA,1,6,02:06:142
+2026-03-12T21:26:18Z,demo,ovalo,salva,QA,2,5,+0.104s
+2026-03-12T21:26:18Z,demo,ovalo,jony,INFRA,3,4,+0.424s
+2026-03-12T21:26:18Z,demo,ovalo,ana,RANDOM,4,3,+1.205s
+2026-03-12T21:26:18Z,demo,ovalo,juan,RANDOM,5,2,+1.376s
+2026-03-12T21:26:18Z,demo,ovalo,leo,RANDOM,6,1,+2.085s
