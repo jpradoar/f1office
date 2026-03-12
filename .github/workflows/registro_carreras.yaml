@@ -1,0 +1,154 @@
+name: 🏁 Resultado de Carreras
+
+on:
+  workflow_dispatch:
+    inputs:
+      campeonato:
+        description: 'Nombre del Campeonato (Creará/Actualizará este archivo)'
+        required: true
+        type: choice
+        options:
+          - temporada_oficina_2026
+          - gran_premio_viernes
+          - copa_invierno
+          - copa_verano
+          - demo
+      pista:
+        description: 'Tipo de Pista'
+        required: true
+        type: choice
+        options:
+          - ovalo
+          - monaco
+          - interna
+      pos1:
+        description: '🥇 1º Puesto (Ej: Carlos,QA)'
+        required: true
+        type: string
+      pos2:
+        description: '🥈 2º Puesto (Ej: Jony,INFRA)'
+        required: true
+        type: string
+      pos3:
+        description: '🥉 3º Puesto'
+        required: true
+        type: string
+      pos4:
+        description: '🏎️ 4º Puesto'
+        required: false
+        type: string
+      pos5:
+        description: '🏎️ 5º Puesto'
+        required: false
+        type: string
+      pos6:
+        description: '🏎️ 6º Puesto (Último)'
+        required: false
+        type: string
+      tiempo:
+        description: '⏱️ Tiempo de carrera (ej. 02:15.340)'
+        required: true
+        type: string
+
+permissions:
+  contents: write
+
+jobs:
+  guardar-resultado:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Descargar el repositorio
+        uses: actions/checkout@v4
+
+      - name: Procesar e inyectar datos en CSV
+        run: |
+          mkdir -p datos_carreras
+          ARCHIVO="datos_carreras/${{ github.event.inputs.campeonato }}.csv"
+          
+          if [ ! -f "$ARCHIVO" ]; then
+            echo "fecha,campeonato,pista,piloto,equipo,posicion,puntos,tiempo" > "$ARCHIVO"
+          fi
+          
+          FECHA=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+          TIEMPO=$(echo "${{ github.event.inputs.tiempo }}" | tr -d ',')
+          
+          # Inicializamos el mensaje de Slack
+          echo "🏁 *¡NUEVA CARRERA COMPLETADA!* 🏁" > slack_msg.txt
+          echo "📍 *Pista:* ${{ github.event.inputs.pista }} | 🏆 *Campeonato:* ${{ github.event.inputs.campeonato }}" >> slack_msg.txt
+          echo "------------------------------------------------------" >> slack_msg.txt
+          
+          GAP_MS=0
+          
+          insertar_piloto() {
+            local INPUT_RAW="$1"
+            local POSICION=$2
+            local PUNTOS=$3
+            
+            if [ -n "$INPUT_RAW" ]; then
+              local PILOTO=$(echo "$INPUT_RAW" | cut -d',' -f1 | xargs)
+              local EQUIPO=$(echo "$INPUT_RAW" | cut -s -d',' -f2 | xargs | tr '[:lower:]' '[:upper:]')
+              if [ -z "$EQUIPO" ]; then EQUIPO="INDEPENDIENTE"; fi
+              
+              local T_CARRERA=""
+              local T_SLACK=""
+              
+              if [ "$POSICION" -eq 1 ]; then
+                T_CARRERA="$TIEMPO"
+                T_SLACK="$TIEMPO"
+                echo "🥇 1º - *$PILOTO* ($EQUIPO) ⏱️ $T_SLACK" >> slack_msg.txt
+              else
+                # Simulador de Gaps de F1: Sumamos entre 100ms y 900ms al coche de delante
+                local INCREMENTO=$(( (RANDOM % 800) + 100 ))
+                GAP_MS=$(( GAP_MS + INCREMENTO ))
+                
+                # Formateamos el tiempo acumulado a segundos y milisegundos (+X.XXXs)
+                local SECS=$(( GAP_MS / 1000 ))
+                local MS=$(( GAP_MS % 1000 ))
+                local MS_STR=$(printf "%03d" $MS)
+                
+                T_CARRERA="+${SECS}.${MS_STR}s"
+                T_SLACK="+${SECS}.${MS_STR}s"
+                
+                # Ponemos medallas para P2 y P3 en Slack
+                local MEDALLA="🏎️ ${POSICION}º"
+                if [ "$POSICION" -eq 2 ]; then MEDALLA="🥈 2º"; fi
+                if [ "$POSICION" -eq 3 ]; then MEDALLA="🥉 3º"; fi
+                
+                echo "$MEDALLA - *$PILOTO* ($EQUIPO) ⏱️ $T_SLACK" >> slack_msg.txt
+              fi
+              
+              # Guardamos en el CSV
+              echo "$FECHA,${{ github.event.inputs.campeonato }},${{ github.event.inputs.pista }},$PILOTO,$EQUIPO,$POSICION,$PUNTOS,$T_CARRERA" >> "$ARCHIVO"
+            fi
+          }
+          
+          insertar_piloto "${{ github.event.inputs.pos1 }}" 1 6
+          insertar_piloto "${{ github.event.inputs.pos2 }}" 2 5
+          insertar_piloto "${{ github.event.inputs.pos3 }}" 3 4
+          insertar_piloto "${{ github.event.inputs.pos4 }}" 4 3
+          insertar_piloto "${{ github.event.inputs.pos5 }}" 5 2
+          insertar_piloto "${{ github.event.inputs.pos6 }}" 6 1
+          
+          echo "------------------------------------------------------" >> slack_msg.txt
+          echo "📊 _Revisa la telemetría en nuestro <https://jpradoar.grafana.net/public-dashboards/e864ea66099e4c58941ce9cf8865fec1|Dashboard de Grafana>_" >> slack_msg.txt
+          
+      - name: Commit y Push de los resultados
+        run: |
+          GANADOR=$(echo "${{ github.event.inputs.pos1 }}" | cut -d',' -f1 | xargs)
+          git config --global user.name "Semaforo-Bot[bot]"
+          git config --global user.email "semaforo-bot[bot]@users.noreply.github.com"
+          git add datos_carreras/
+          git commit -m "📊 Resultado: ${{ github.event.inputs.pista }} | Ganador: $GANADOR"
+          git push
+
+      - name: 📢 Notificar a Slack
+        run: |
+          # Formateamos el mensaje de forma segura para JSON
+          PAYLOAD=$(jq -n --arg text "$(cat slack_msg.txt)" '{text: $text}')
+          
+          # Enviamos el POST al Webhook (Si existe el secreto)
+          if [ "${{ secrets.SLACK_WEBHOOK }}" != "" ]; then
+            curl -X POST -H 'Content-type: application/json' --data "$PAYLOAD" ${{ secrets.SLACK_WEBHOOK }}
+          else
+            echo "⚠️ No se ha configurado SLACK_WEBHOOK en los secrets del repositorio."
+          fi

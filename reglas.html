@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>📜 Reglamento Oficial: Gran Premio Oficina RC 1:64</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #0d1117;
+            --text-color: #c9d1d9;
+            --heading-color: #ffffff;
+            --accent: #ff3333;
+            --card-bg: #161b22;
+            --border-color: #30363d;
+        }
+
+        body {
+            font-family: 'Inter', "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .container {
+            max-width: 800px;
+            width: 100%;
+            background: var(--bg-color);
+        }
+
+        /* Navegación */
+        .nav-bar {
+            margin-bottom: 30px;
+        }
+        .btn-back {
+            display: inline-block;
+            color: var(--text-color);
+            text-decoration: none;
+            font-weight: bold;
+            padding: 8px 15px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            background: var(--card-bg);
+            transition: all 0.2s;
+        }
+        .btn-back:hover {
+            background: var(--border-color);
+            color: #fff;
+        }
+
+        /* Tipografía */
+        h1 {
+            color: var(--heading-color);
+            font-size: 2.2em;
+            font-weight: 900;
+            border-bottom: 2px solid var(--border-color);
+            padding-bottom: 15px;
+            margin-bottom: 20px;
+            line-height: 1.2;
+        }
+
+        h2 {
+            color: var(--heading-color);
+            font-size: 1.5em;
+            margin-top: 40px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        p {
+            font-size: 1.05em;
+            margin-bottom: 15px;
+        }
+
+        strong {
+            color: var(--heading-color);
+        }
+
+        /* Listas */
+        ul {
+            padding-left: 20px;
+        }
+        li {
+            margin-bottom: 12px;
+            font-size: 1.05em;
+        }
+        li::marker {
+            color: var(--accent);
+        }
+
+        /* Imágenes */
+        .img-center {
+            text-align: center;
+            margin: 30px 0;
+        }
+        .img-center img {
+            max-width: 100%;
+            height: auto;
+            max-height: 350px;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+            margin: 0 10px;
+        }
+        .img-row {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+            margin: 30px 0;
+        }
+        .img-row img {
+            max-height: 250px;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+        }
+
+        /* Botones Especiales */
+        .btn-primary {
+            display: inline-block;
+            background-color: var(--accent);
+            color: white;
+            text-decoration: none;
+            font-weight: bold;
+            padding: 12px 24px;
+            border-radius: 6px;
+            margin-top: 15px;
+            transition: background-color 0.3s;
+        }
+        .btn-primary:hover {
+            background-color: #cc0000;
+        }
+
+        /* Footer */
+        .footer-text {
+            text-align: center;
+            font-size: 1.5em;
+            font-weight: 900;
+            color: var(--heading-color);
+            margin-top: 50px;
+            padding-top: 20px;
+            border-top: 1px solid var(--border-color);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <div class="nav-bar">
+            <a href="index.html" class="btn-back">⬅ Volver al Inicio</a>
+        </div>
+
+        <h1>📜 Reglamento Oficial: Gran Premio Oficina RC 1:64</h1>
+
+        <p>¡Bienvenidos al campeonato oficial de la oficina! Cualquier persona de cualquier área es bienvenida a participar, ya sea como piloto, ingeniero de pista o espectador.</p>
+        
+        <p>Hemos elegido la <strong>escala 1:64</strong> porque es pequeña, práctica, económica y, lo más importante: <strong>es la plataforma perfecta para hackear y hacer <em>modding</em></strong>. Queremos que la pista esté llena de coches únicos, modificados con ingenio y espíritu <em>maker</em>.</p>
+
+        <h2>🚦 Reglas Básicas de Carrera (Para que sea divertido)</h2>
+        <ul>
+            <li><strong>Respeto en la pista:</strong> Las carreras de RC son de contacto ("Rubbing is racing"), pero los choques intencionales (estilo <em>kamikaze</em> o frenar en seco para arruinar al de atrás) conllevan descalificación. ¡Sana competitividad ante todo!</li>
+            <li><strong>Salidas en falso (Jump Start):</strong> Quien cruce la línea de salida antes de que el semáforo de nuestra Web App se ponga en verde, recibirá una penalización de +5 segundos al final de la carrera o deberá salir desde el último lugar en el reinicio.</li>
+            <li><strong>Accidentes y Vuelcos (La "Mano de Dios"):</strong> Si un coche vuelca o se queda atascado, un espectador o el Juez de Pista podrá actuar como "Grúa" y devolver el coche a la pista en el mismo lugar del accidente.</li>
+            <li><strong>Tiempos y Puntuación:</strong> Las posiciones finales y los tiempos de vuelta rápida se registrarán en nuestro sistema automatizado de GitHub y se reflejarán en el Dashboard público de Grafana. La decisión del Juez de Pista es inapelable.</li>
+        </ul>
+
+        <h2>🚦 APP Semáforo</h2>
+        <div class="img-center">
+            <img src="img/luces.jpeg" alt="Semáforo de Carreras">
+        </div>
+        <p>El semáforo tiene su propia app para que sea customizable a futuro. ¡Incluye un contador de vueltas, cronómetro y hasta sonido!</p>
+        <div style="text-align: center;">
+            <a href="luces.html" class="btn-primary" target="_blank">🚥 Abrir App del Semáforo</a>
+        </div>
+
+        <h2>🔧 Mods, Hacks y Límites (La Cultura del Garaje)</h2>
+        <div class="img-row">
+            <img src="img/os.jpeg" alt="Modificación RC 1">
+            <img src="img/oh.png" alt="Modificación RC 2">
+        </div>
+        <p>Fomentamos el espíritu del Código Abierto llevado al hardware. Se permite (¡y se anima!) a modificar los vehículos para ganar décimas de segundo, pero para mantener la igualdad económica y la seguridad, establecemos las siguientes reglas:</p>
+        <ul>
+            <li><strong>Alivianado y Carrocería:</strong> Puedes recortar, taladrar o cambiar la carrocería por opciones impresas en 3D para reducir el peso. La aerodinámica casera es bienvenida.</li>
+            <li><strong>Modificación de Chasis:</strong> Cortar, reforzar o alterar la distribución de peso del chasis está 100% permitido.</li>
+            <li><strong>Hackeo de Baterías:</strong> Puedes reemplazar la batería original por una de mayor capacidad (más mAh) para asegurar que tu coche aguante carreras largas de resistencia. <strong>Las 500 Millas de Indianápolis (Indy 1:64)</strong>.</li>
+            <li><strong>El Límite de Voltaje:</strong> La batería de reemplazo debe ser estrictamente de <strong>3.7V</strong> (1S LiPo/Li-Ion). No se permiten baterías de mayor voltaje para sobrealimentar el motor base, ya que buscamos premiar la pericia del piloto y el ajuste del chasis, no quién compra el motor más explosivo.</li>
+            <li><strong>Neumáticos y Agarre:</strong> Modificar los compuestos, limpiar las ruedas con aditivos o crear tus propios neumáticos está permitido.</li>
+            <li><strong>Tamaño Máximo:</strong> Las modificaciones no pueden hacer que el vehículo exceda significativamente las proporciones de la escala 1:64 (aprox. 3.5 cm de ancho), para garantizar que entren 4 coches en nuestra pista de la oficina.</li>
+        </ul>
+
+        <h2>🏁 Formato de Gran Premio</h2>
+        <ul>
+            <li><strong>Prácticas Libres:</strong> Tiempo para probar <em>setups</em>, adherencia y calentar pulgares.</li>
+            <li><strong>Clasificación (Qualy):</strong> 3 vueltas en solitario contra el cronómetro. El mejor tiempo decide la <em>Pole Position</em>.</li>
+            <li><strong>Carrera Principal:</strong> Sprint a un número de vueltas predefinido por el Juez de Pista (ej. 5 vueltas). ¡El primero en cruzar la meta se lleva la gloria!</li>
+        </ul>
+
+        <div class="footer-text">
+            ¡Nos vemos en la pista! 🏎️💨
+        </div>
+    </div>
+
+</body>
+</html>

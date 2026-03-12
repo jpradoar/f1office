@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gran Premio Oficina: RC 1:64</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+    
+    <script type="module">
+      import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+      mermaid.initialize({ startOnLoad: true, theme: 'dark' });
+    </script>
+
+    <style>
+        :root {
+            --bg-color: #0d1117;
+            --text-color: #c9d1d9;
+            --accent-color: #ff3333;
+            --card-bg: #161b22;
+            --border-color: #30363d;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px 0;
+        }
+
+        h1, h2, h3 {
+            color: #ffffff;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 10px;
+            margin-top: 40px;
+        }
+
+        h1 {
+            font-size: 2.2em;
+            text-align: center;
+            border-bottom: none;
+            color: var(--accent-color);
+        }
+
+        .lead {
+            font-size: 1.1em;
+            text-align: justify;
+            background: var(--card-bg);
+            padding: 20px;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            margin-bottom: 30px;
+        }
+
+        ul {
+            padding-left: 20px;
+        }
+
+        li {
+            margin-bottom: 10px;
+        }
+
+        strong {
+            color: #ffffff;
+        }
+
+        .center-img {
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        .center-img img {
+            max-width: 100%;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+        }
+
+        .note {
+            background-color: rgba(255, 204, 0, 0.1);
+            border-left: 4px solid #ffcc00;
+            padding: 10px 15px;
+            margin-top: 15px;
+            border-radius: 0 4px 4px 0;
+        }
+
+        /* Estilos para los botones de Enlaces Rápidos */
+        .btn-group {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin: 30px 0;
+        }
+
+        .btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 15px 20px;
+            font-size: 1.1em;
+            font-weight: 600;
+            text-decoration: none;
+            color: #fff;
+            border-radius: 8px;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.4);
+        }
+
+        .btn-semaforo { background: linear-gradient(135deg, #00b09b, #96c93d); }
+        .btn-grafana { background: linear-gradient(135deg, #f05033, #e67e22); }
+        .btn-reglas { background: linear-gradient(135deg, #2c3e50, #3498db); }
+
+        .btn-icon {
+            font-size: 1.5em;
+            margin-right: 10px;
+        }
+
+        .mermaid-container {
+            background: var(--card-bg);
+            padding: 20px;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            overflow-x: auto;
+            text-align: center;
+        }
+
+        .mods-grid {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+            margin: 20px 0;
+        }
+
+        .mods-grid img {
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+            object-fit: cover;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>🏁 Gran Premio Oficina RC 1:64 🏎️💨</h1>
+    <h2>Telemetry & Race Control </h2>
+
+    <div class="lead">
+        <p>¡Bienvenido al sistema de control de carrera y telemetría definitivo para las competiciones de autitos a radiocontrol (Escala 1:64) en la oficina!</p>
+        
+        <p>Más que un simple proyecto tecnológico, esta es una <strong>iniciativa para fomentar el compañerismo, el <em>team building</em> y una sana competitividad entre las diferentes áreas de la empresa</strong>. Es la excusa perfecta para desconectar unos minutos de las pantallas, compartir risas entre departamentos y llevar las típicas carreras de escritorio al siguiente nivel, integrando un semáforo de salida profesional estilo Fórmula 1 y un panel de estadísticas en tiempo real.</p>
+        
+        <p>Además, es también la oportunidad de compartir con otros el mundo del Código Abierto, fomentando que no solo podemos jugar y hackear autitos, sino compartir <em>mods</em> de dashboards de Grafana y explorar más tecnologías.</p>
+    </div>
+
+    <h2>🎯 Objetivos del Proyecto</h2>
+    <ul>
+        <li><strong>Team Building:</strong> Romper el hielo entre departamentos y crear un espacio de interacción divertida y sana competencia en el lugar de trabajo.</li>
+        <li><strong>Infraestructura Serverless:</strong> Proveer un sistema gratuito y altamente disponible para dar salidas de carrera justas y sincronizadas con alertas visuales y sonoras.</li>
+        <li><strong>Automatización:</strong> Registrar los resultados y tiempos de cada Gran Premio de forma segura mediante flujos de trabajo en la nube.</li>
+        <li><strong>Transparencia y Emoción:</strong> Visualizar la clasificación general, estadísticas de victorias y récords de pista en un Dashboard público accesible para toda la oficina.</li>
+    </ul>
+
+
+
+    <h2>🦾 Workflow CD/CD</h2>
+    <div align="center">
+       <img src="img/workflow.png">
+    </div>
+
+    
+    <h2>🏎️ Los coches</h2>
+    <div class="center-img">
+        <img src="img/4coches.png" alt="Coches RC 1:64">
+	<br>
+	<img src="img/escala.png">
+    </div>
+    <div class="note">
+        <strong>Nota:</strong> Usamos esta escala porque es pequeña, práctica y sobre todo económica. Cualquiera que quiera participar es bienvenido. Y lo más importante, <strong>usamos estos porque son muy hackeables</strong> y fáciles de hacer "MODS" (alivianado, modificación de chasis, cambio de batería de 3.7V por una de más mAh, etc).
+    </div>
+
+    <h2>🔗 Enlaces Rápidos</h2>
+    <div class="btn-group">
+        <a href="https://jpradoar.github.io/f1office/luces.html" target="_blank" class="btn btn-semaforo">
+            <span class="btn-icon">🚦</span> App del Semáforo y Cronómetro
+        </a>
+        <a href="https://jpradoar.grafana.net/public-dashboards/4b359d53cd6c465b93d9f324ea53790a" target="_blank" class="btn btn-grafana">
+            <span class="btn-icon">📊</span> Dashboard de Telemetría (Grafana)
+        </a>
+        <a href="https://jpradoar.github.io/f1office/reglas.html" target="_blank" class="btn btn-reglas">
+            <span class="btn-icon">📜</span> Leer el Reglamento Oficial
+        </a>
+                <a href="https://jpradoar.github.io/f1office/credencial.html" target="_blank" class="btn btn-reglas">
+            <span class="btn-icon">👤</span> Credencial de Piloto
+        </a>
+    </div>
+
+    <h2>🏗️ Arquitectura del Sistema</h2>
+    <p>El sistema está diseñado bajo una filosofía de "Data Engineering" ligera, aplicando el "Principio KISS" como principio fundamental y usando herramientas modernas para evitar el uso de bases de datos complejas y mantenimiento de sistemas y/o servers.  <b>(...y como siempre todo Open Source)</b>.</p>
+    
+    <div class="mermaid-container">
+        <pre class="mermaid">
+        graph TD
+            A[📱 Semáforo Web App] -->|Pistoletazo de salida| B(🏎️ Carrera de RC)
+            B -->|Crono y Posiciones| C{Juez de Pista}
+            C -->|Ejecuta Workflow| D[⚙️ GitHub Actions]
+            D -->|Procesa e inyecta fila| E[(📄 Archivo CSV)]
+            E -->|Fetch vía URL Raw| F[🔌 Plugin Infinity]
+            F -->|Renderiza métricas| G[📊 Grafana Cloud]
+        </pre>
+    </div>
+
+
+
+<h2> 💻 Tecnologias y Diseño</h2>
+
+<h3> Github Dispatch (manual trigger)</h3>
+<div align="center">
+   <img src="img/gh-dispatch.png">
+</div>
+
+<br><br>
+
+<h3> Mensaje a slack (para generar la polémica)</h3>
+
+<div align="center">
+   <img src="img/slack.png">
+</div>
+
+<br><br>
+
+<h3> Grafana Dashboard para ver las metricas</h3>
+<div align="center">
+   <img src="img/dashboard-01.png">
+  Grafana cloud para no tener que adminsitrar nada
+</div>
+
+
+    
+
+    <h2>🔧 La Cultura del Garaje (Mods, Hacks y Límites)</h2>
+    <div class="mods-grid">
+        <img src="img/os.jpeg" height="150px" alt="Mod interior"> 
+        <img src="img/oh.png" height="150px" alt="Mod exterior"> 
+    </div>
+    <p>Fomentamos el espíritu del Código Abierto llevado al hardware. Se permite (¡y se anima!) a modificar los vehículos para ganar décimas de segundo, pero para mantener la igualdad económica y la seguridad, establecemos unas mínimas <strong><a href="https://jpradoar.github.io/f1office/reglas.html" style="color: var(--accent-color);">REGLAS</a></strong>.</p>
+
+</div>
+
+</body>
+</html>

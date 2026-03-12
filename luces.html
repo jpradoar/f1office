@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
+<title>RC F1 Start</title>
+
+<style>
+body {
+    background: #111;
+    color: white;
+    font-family: Arial, sans-serif;
+    text-align: center;
+    margin: 0;
+    user-select: none; 
+}
+
+.panel {
+    background: #000;
+    padding: 10px;
+}
+
+#lights {
+    display: flex;
+    justify-content: center;
+    gap: 2vw;
+    margin: 1px 0;
+}
+.lightBox{
+background:#222;
+padding:2px;
+border-radius:10px;
+box-shadow:0 0 10px #000 inset;
+}
+
+.light {
+    width: 19vw;
+    height: 19vw;
+    max-width: 180px;
+    max-height: 180px;
+    border-radius: 50%;
+    background: #330000;
+    transition: background 0.1s, box-shadow 0.1s;
+}
+
+/* Luces rojas */
+.on {
+    background: #ff0000;
+    box-shadow: 0 0 20px red, 0 0 50px red;
+}
+
+/* Luces verdes (Verde completo) */
+.green {
+    background: #00ff00;
+    box-shadow: 0 0 40px #00ff00, 0 0 90px #00ff00;
+}
+
+button {
+    font-size: 5vw;
+    padding: 10px 16px;
+    margin: 5px;
+    border: none;
+    border-radius: 10px;
+    font-weight: bold;
+    touch-action: manipulation; 
+    cursor: pointer;
+}
+
+#start { background: #2196f3; color: white; }
+#stop { background: #ff9800; color: white; }
+#reset { background: #e53935; color: white; }
+#fs { background: #4caf50; color: white; }
+
+/* Botón de sonido dinámico */
+#soundBtn {
+    background: #4caf50; /* Verde por defecto (ON) */
+    color: white;
+}
+
+.crono {
+    font-size: 10vw;
+    margin-top: 15px;
+    font-family: monospace;
+}
+
+.vueltas {
+    font-size: 7vw;
+    margin-top: 5px;
+}
+
+.vueltas button {
+    font-size: 9vw;
+    padding: 2px 8px;
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="panel">
+    <div id="lights">
+        <div class="lightBox"><div class="light" id="l1"></div></div>
+        <div class="lightBox"><div class="light" id="l2"></div></div>
+        <div class="lightBox"><div class="light" id="l3"></div></div>
+        <div class="lightBox"><div class="light" id="l4"></div></div>
+    </div>
+</div>
+
+
+
+<button id="start"><i class="fa fa-play" aria-hidden="true"></i></button>
+<button id="stop"><i class="fa fa-stop" aria-hidden="true"></i></button>
+<button id="reset"><i class="fa fa-repeat" aria-hidden="true"></i></button>
+<button id="fs"><i class="fa fa-desktop" aria-hidden="true"></i></button> 
+<button id="soundBtn"><i class="fa fa-volume-up" aria-hidden="true"></i></button>
+<br>
+<img src="https://companiesmarketcap.com/img/company-logos/256/FWONK.webp" height="150px">
+
+
+<div class="crono" id="cronometro">00:00.000</div>
+
+<div class="vueltas">
+    VUELTAS  <button id="menos">-</button>
+    <span id="laps">0</span>
+    <button id="mas">+</button>
+</div>
+
+<audio id="beepRed">
+    <source src="https://actions.google.com/sounds/v1/alarms/beep_short.ogg">
+</audio>
+
+<audio id="beepGreen">
+    <source id="crowd" src="https://github.com/jpradoar/f1office/raw/refs/heads/main/gente.mp3" type="audio/mpeg" />
+</audio>
+
+<script>
+let inicioTiempo = 0;
+let intervalo = null;
+let vueltas = 0;
+let isRacing = false; 
+let abortarSecuencia = false; 
+let isMp3Enabled = true; // Variable que controla si suena la gente
+
+const lights = [
+    document.getElementById("l1"),
+    document.getElementById("l2"),
+    document.getElementById("l3"),
+    document.getElementById("l4")
+];
+
+const soundBtn = document.getElementById("soundBtn");
+const beepRed = document.getElementById("beepRed");
+const beepGreen = document.getElementById("beepGreen");
+
+// Lógica para cambiar el aspecto del botón de sonido
+soundBtn.onclick = () => {
+    isMp3Enabled = !isMp3Enabled;
+    if(isMp3Enabled) {
+        soundBtn.style.background = "#4caf50"; // Verde
+        soundBtn.innerText = "🔊";
+    } else {
+        soundBtn.style.background = "#e53935"; // Rojo
+        soundBtn.innerText = "🔇";
+    }
+};
+
+function redSound(){
+    // El pitido rojo suena siempre
+    beepRed.currentTime = 0;
+    beepRed.play().catch(e => console.log("Sonido bloqueado", e));
+}
+
+function greenSound(){
+    // El mp3 solo suena si la variable está en true
+    if (isMp3Enabled) {
+        beepGreen.currentTime = 0;
+        beepGreen.play().catch(e => console.log("Sonido bloqueado", e));
+    }
+}
+
+function delay(ms){
+    return new Promise(r => setTimeout(r, ms));
+}
+
+async function startRace(){
+    if(isRacing) return; 
+    
+    isRacing = true;
+    abortarSecuencia = false; 
+    resetLights();
+
+    let espera = 2000 + Math.random() * 1000;
+    await delay(espera);
+    if(abortarSecuencia) return; 
+
+    // Enciende las luces rojas una por una
+    for(let i=0; i < lights.length; i++){
+        lights[i].classList.add("on");
+        redSound();
+        await delay(700);
+        if(abortarSecuencia) return;
+    }
+
+    // Pausa dramática aleatoria
+    let pausa = 500 + Math.random() * 1500;
+    await delay(pausa);
+    if(abortarSecuencia) return;
+
+    // 1. SE APAGA TODO
+    lights.forEach(l => l.classList.remove("on"));
+    
+    // 2. BREVE SUSPENSO DE LUCES APAGADAS (400 ms)
+    await delay(400);
+    if(abortarSecuencia) return;
+
+    // 3. SE ENCIENDE VERDE COMPLETO
+    lights.forEach(l => l.classList.add("green"));
+
+    greenSound();
+    startChrono();
+}
+
+function startChrono(){
+    inicioTiempo = Date.now();
+
+    intervalo = setInterval(()=>{
+        let t = Date.now() - inicioTiempo;
+
+        let ms = t % 1000;
+        let s = Math.floor(t / 1000) % 60;
+        let m = Math.floor(t / 60000);
+
+        document.getElementById("cronometro").innerText =
+            String(m).padStart(2,"0") + ":" +
+            String(s).padStart(2,"0") + "." +
+            String(ms).padStart(3,"0");
+
+    }, 10);
+}
+
+// STOP TOTAL: frena tiempo, música y secuencias en curso
+function stopAll(){
+    abortarSecuencia = true; 
+    isRacing = false;
+    clearInterval(intervalo);
+    
+    beepGreen.pause();
+    beepGreen.currentTime = 0;
+    
+    beepRed.pause();
+    beepRed.currentTime = 0;
+}
+
+function resetLights(){
+    lights.forEach(l => {
+        l.classList.remove("on");
+        l.classList.remove("green");
+    });
+}
+
+function resetAll(){
+    stopAll(); 
+    resetLights();
+    
+    vueltas = 0;
+    document.getElementById("laps").innerText = 0;
+    document.getElementById("cronometro").innerText = "00:00.000";
+}
+
+// Asignación de eventos principales
+document.getElementById("start").onclick = startRace;
+document.getElementById("stop").onclick = stopAll; 
+document.getElementById("reset").onclick = resetAll;
+
+document.getElementById("mas").onclick = () => {
+    vueltas++;
+    document.getElementById("laps").innerText = vueltas;
+};
+
+document.getElementById("menos").onclick = () => {
+    if(vueltas > 0) vueltas--;
+    document.getElementById("laps").innerText = vueltas;
+};
+
+document.getElementById("fs").onclick = () => {
+    document.documentElement.requestFullscreen().catch((e) => {
+        console.log("No se pudo entrar en pantalla completa", e);
+    });
+};
+
+</script>
+</body>
+</html>
