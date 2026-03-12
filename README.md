@@ -1,7 +1,7 @@
 # 🏁 Gran Premio Oficina RC 1:64 🏎️💨
 ### Telemetry & Race Control 
 
-¡Bienvenido al sistema de control de carrera y telemetría definitivo para las competiciones de autitos a radiocontrol (Escala 1:64) en la oficina! 
+¡Bienvenido al sistema de control de carrera y telemetría para las competiciones de autitos a radiocontrol (Escala 1:64) en la oficina! 
 
 Más que un simple proyecto tecnológico, esta es una **iniciativa para fomentar el compañerismo, el *team building* y una sana competitividad entre las diferentes áreas de la empresa**. Es la excusa perfecta para desconectar unos minutos de las pantallas, compartir risas entre departamentos y llevar las típicas carreras de escritorio al siguiente nivel, integrando un semáforo de salida profesional estilo Fórmula 1 y un panel de estadísticas en tiempo real.
 
