@@ -55,7 +55,7 @@ fecha,campeonato,pista,piloto,equipo,posicion,puntos,tiempo
 2026-02-09T18:39:05Z,copa_verano,interna,juan,RRHH,6,1,+2.270s
 2026-02-10T18:31:39Z,copa_verano,ovalo,carlos,QA,1,6,02:05:880
 2026-02-10T18:31:39Z,copa_verano,ovalo,salva,QA,2,5,+0.733s
-2026-02-10T18:31:39Z,copa_verano,ovalo,ana,RRHH,3,4,+0.888s
+2026-02-10T18:31:39Z,copa_verano,ovalo,ana,RRHH,3,4,+0.120s
 2026-02-10T18:31:39Z,copa_verano,ovalo,jony,INFRA,4,3,+1.619s
 2026-02-10T18:31:39Z,copa_verano,ovalo,leo,RRHH,5,2,+2.355s
 2026-02-10T18:31:39Z,copa_verano,ovalo,juan,RRHH,6,1,+2.804s
