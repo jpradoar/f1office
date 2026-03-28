@@ -64,34 +64,34 @@ jobs:
         run: |
           mkdir -p datos_carreras
           ARCHIVO="datos_carreras/${{ github.event.inputs.campeonato }}.csv"
-          
+
           if [ ! -f "$ARCHIVO" ]; then
             echo "fecha,campeonato,pista,piloto,equipo,posicion,puntos,tiempo" > "$ARCHIVO"
           fi
-          
+
           FECHA=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
           TIEMPO=$(echo "${{ github.event.inputs.tiempo }}" | tr -d ',')
-          
+
           # Inicializamos el mensaje de Slack
           echo "🏁 *¡NUEVA CARRERA COMPLETADA!* 🏁" > slack_msg.txt
           echo "📍 *Pista:* ${{ github.event.inputs.pista }} | 🏆 *Campeonato:* ${{ github.event.inputs.campeonato }}" >> slack_msg.txt
           echo "------------------------------------------------------" >> slack_msg.txt
-          
+
           GAP_MS=0
-          
+
           insertar_piloto() {
             local INPUT_RAW="$1"
             local POSICION=$2
             local PUNTOS=$3
-            
+
             if [ -n "$INPUT_RAW" ]; then
               local PILOTO=$(echo "$INPUT_RAW" | cut -d',' -f1 | xargs)
               local EQUIPO=$(echo "$INPUT_RAW" | cut -s -d',' -f2 | xargs | tr '[:lower:]' '[:upper:]')
               if [ -z "$EQUIPO" ]; then EQUIPO="INDEPENDIENTE"; fi
-              
+
               local T_CARRERA=""
               local T_SLACK=""
-              
+
               if [ "$POSICION" -eq 1 ]; then
                 T_CARRERA="$TIEMPO"
                 T_SLACK="$TIEMPO"
@@ -100,55 +100,238 @@ jobs:
                 # Simulador de Gaps de F1: Sumamos entre 100ms y 900ms al coche de delante
                 local INCREMENTO=$(( (RANDOM % 800) + 100 ))
                 GAP_MS=$(( GAP_MS + INCREMENTO ))
-                
-                # Formateamos el tiempo acumulado a segundos y milisegundos (+X.XXXs)
+
                 local SECS=$(( GAP_MS / 1000 ))
                 local MS=$(( GAP_MS % 1000 ))
                 local MS_STR=$(printf "%03d" $MS)
-                
+
                 T_CARRERA="+${SECS}.${MS_STR}s"
                 T_SLACK="+${SECS}.${MS_STR}s"
-                
-                # Ponemos medallas para P2 y P3 en Slack
+
                 local MEDALLA="🏎️ ${POSICION}º"
                 if [ "$POSICION" -eq 2 ]; then MEDALLA="🥈 2º"; fi
                 if [ "$POSICION" -eq 3 ]; then MEDALLA="🥉 3º"; fi
-                
+
                 echo "$MEDALLA - *$PILOTO* ($EQUIPO) ⏱️ $T_SLACK" >> slack_msg.txt
               fi
-              
+
               # Guardamos en el CSV
               echo "$FECHA,${{ github.event.inputs.campeonato }},${{ github.event.inputs.pista }},$PILOTO,$EQUIPO,$POSICION,$PUNTOS,$T_CARRERA" >> "$ARCHIVO"
             fi
           }
-          
+
           insertar_piloto "${{ github.event.inputs.pos1 }}" 1 6
           insertar_piloto "${{ github.event.inputs.pos2 }}" 2 5
           insertar_piloto "${{ github.event.inputs.pos3 }}" 3 4
           insertar_piloto "${{ github.event.inputs.pos4 }}" 4 3
           insertar_piloto "${{ github.event.inputs.pos5 }}" 5 2
           insertar_piloto "${{ github.event.inputs.pos6 }}" 6 1
-          
-          echo "------------------------------------------------------" >> slack_msg.txt
-          echo "📊 _Revisa la telemetría en nuestro <https://jpradoar.grafana.net/public-dashboards/e864ea66099e4c58941ce9cf8865fec1|Dashboard de Grafana>_" >> slack_msg.txt
-          
+
+      - name: Instalar dependencias Python
+        run: pip install anthropic --quiet
+
+      - name: Calcular ratings ELO
+        run: |
+          python3 - <<'EOF'
+          import csv, math
+          from pathlib import Path
+
+          ELO_FILE = "datos_carreras/elo.csv"
+          K = 24  # Factor K estándar
+
+          def expected_score(ra, rb):
+              return 1 / (1 + 10 ** ((rb - ra) / 400))
+
+          # Cargar ELO existente
+          ratings = {}
+          if Path(ELO_FILE).exists():
+              with open(ELO_FILE) as f:
+                  reader = csv.DictReader(f)
+                  for row in reader:
+                      ratings[row['piloto']] = float(row['elo'])
+
+          # Parsear pilotos desde los inputs del workflow (formato: "Nombre,EQUIPO")
+          pilotos_raw = [
+              "${{ github.event.inputs.pos1 }}",
+              "${{ github.event.inputs.pos2 }}",
+              "${{ github.event.inputs.pos3 }}",
+              "${{ github.event.inputs.pos4 }}",
+              "${{ github.event.inputs.pos5 }}",
+              "${{ github.event.inputs.pos6 }}",
+          ]
+
+          pilotos = []
+          for p in pilotos_raw:
+              p = p.strip()
+              if p:
+                  nombre = p.split(',')[0].strip().lower()
+                  pilotos.append(nombre)
+
+          # Inicializar pilotos nuevos en 1200
+          for p in pilotos:
+              if p not in ratings:
+                  ratings[p] = 1200.0
+
+          # Guardar ELO pre-carrera para el comentarista
+          pre_race = dict(ratings)
+
+          # Calcular nuevos ELOs: cada par (i,j) donde i terminó antes que j → i gana el duelo
+          new_ratings = dict(ratings)
+          n = len(pilotos)
+          for i in range(n):
+              for j in range(i + 1, n):
+                  winner = pilotos[i]
+                  loser  = pilotos[j]
+                  rw = ratings[winner]
+                  rl = ratings[loser]
+                  ew = expected_score(rw, rl)
+                  new_ratings[winner] += K * (1 - ew)
+                  new_ratings[loser]  += K * (0 - (1 - ew))
+
+          # Guardar ELO actualizado
+          all_pilots = sorted(new_ratings.keys(), key=lambda x: new_ratings[x], reverse=True)
+          with open(ELO_FILE, 'w', newline='') as f:
+              writer = csv.writer(f)
+              writer.writerow(['piloto', 'elo'])
+              for p in all_pilots:
+                  writer.writerow([p, round(new_ratings[p], 1)])
+
+          # Escribir contexto ELO pre-carrera para el paso del comentarista
+          elo_sorted = sorted(pre_race.items(), key=lambda x: x[1], reverse=True)
+          elo_str = ", ".join(f"{p}={int(r)}" for p, r in elo_sorted)
+
+          delta = 0
+          if len(pilotos) >= 2:
+              delta = int(pre_race.get(pilotos[0], 1200) - pre_race.get(pilotos[1], 1200))
+
+          with open("elo_context.txt", 'w') as f:
+              f.write(f"RATINGS:{elo_str}\n")
+              f.write(f"DELTA_P1_P2:{delta}\n")
+
+          print(f" ELO actualizado → {elo_str}")
+          print(f"   Delta P1 vs P2: {delta} puntos ELO")
+          EOF
+
+      - name: Generar comentario de carrera con IA
+        env:
+          ANTHROPIC_AUTH_TOKEN: ${{ secrets.ANTHROPIC_AUTH_TOKEN }}
+          ANTHROPIC_BASE_URL: ${{ secrets.ANTHROPIC_BASE_URL }}
+          ANTHROPIC_MODEL: ${{ secrets.ANTHROPIC_MODEL }}
+        run: |
+          python3 - <<'EOF'
+          import anthropic, os, csv
+          from pathlib import Path
+
+          api_key  = os.environ.get("ANTHROPIC_AUTH_TOKEN", "")
+          base_url = os.environ.get("ANTHROPIC_BASE_URL", "").strip()
+          model    = os.environ.get("ANTHROPIC_MODEL", "claude-haiku-4-5-20251001").strip()
+
+          if not api_key:
+              print(" ANTHROPIC_AUTH_TOKEN no configurada. Saltando comentario de carrera.")
+              # Añadir igualmente el link de Grafana al mensaje
+              with open("slack_msg.txt", "a") as f:
+                  f.write("\n------------------------------------------------------\n")
+                  f.write(" _Revisa la telemetría en nuestro <https://jpradoar.grafana.net/public-dashboards/e864ea66099e4c58941ce9cf8865fec1|Dashboard de Grafana>_")
+              exit(0)
+
+          # Leer contexto ELO pre-carrera
+          elo_ratings = "No disponible"
+          delta_elo = "0"
+          if Path("elo_context.txt").exists():
+              with open("elo_context.txt") as f:
+                  for line in f:
+                      if line.startswith("RATINGS:"):
+                          elo_ratings = line.replace("RATINGS:", "").strip()
+                      elif line.startswith("DELTA_P1_P2:"):
+                          delta_elo = line.replace("DELTA_P1_P2:", "").strip()
+
+          # Leer clasificación del campeonato (puntos acumulados por piloto)
+          campeonato = "${{ github.event.inputs.campeonato }}"
+          csv_file = f"datos_carreras/{campeonato}.csv"
+          puntos_campeonato = "No disponible"
+          if Path(csv_file).exists():
+              puntos = {}
+              with open(csv_file) as f:
+                  reader = csv.DictReader(f)
+                  for row in reader:
+                      p = row['piloto']
+                      puntos[p] = puntos.get(p, 0) + int(row['puntos'])
+              sorted_puntos = sorted(puntos.items(), key=lambda x: x[1], reverse=True)
+              puntos_campeonato = ", ".join(f"{p}={pts}pts" for p, pts in sorted_puntos)
+
+          # Construir resultado de la carrera
+          resultado = (
+              "Carrera: ${{ github.event.inputs.pista }}\n"
+              "Campeonato: ${{ github.event.inputs.campeonato }}\n"
+              "1º ${{ github.event.inputs.pos1 }}\n"
+              "2º ${{ github.event.inputs.pos2 }}\n"
+              "3º ${{ github.event.inputs.pos3 }}\n"
+              "4º ${{ github.event.inputs.pos4 }}\n"
+              "5º ${{ github.event.inputs.pos5 }}\n"
+              "6º ${{ github.event.inputs.pos6 }}\n"
+              "Tiempo ganador: ${{ github.event.inputs.tiempo }}"
+          )
+
+          # Contexto enriquecido para el prompt
+          context = (
+              f"RESULTADO DE HOY:\n{resultado}\n\n"
+              f"RATINGS ELO ACTUALES (antes de esta carrera):\n{elo_ratings}\n\n"
+              f"CLASIFICACIÓN DEL CAMPEONATO:\n{puntos_campeonato}\n\n"
+              f"DATO EXTRA: diferencia de ELO entre P1 y P2: {delta_elo} puntos"
+          )
+
+          client_kwargs = {"api_key": api_key}
+          if base_url:
+              client_kwargs["base_url"] = base_url
+
+          client = anthropic.Anthropic(**client_kwargs)
+          message = client.messages.create(
+              model=model,
+              max_tokens=400,
+              messages=[{"role": "user", "content": (
+                  "Eres el comentarista oficial del Gran Premio de la Oficina RC 1:64.\n"
+                  "Tu estilo es dramático, apasionado y técnico como Murray Walker y Martin Brundle combinados.\n"
+                  "Hablas en español. Usas terminología F1 real (sector, pit wall, undercut, DRS, vuelta rápida).\n"
+                  "Los equipos son departamentos de empresa (QA, INFRA, RANDOM, etc.) — tratalos como escuderías rivales.\n\n"
+                  "Genera un comentario de carrera de máximo 4 frases. Debe tener:\n"
+                  "- Una frase de apertura dramática sobre el resultado\n"
+                  "- Una mención al duelo más interesante (P1 vs P2)\n"
+                  "- Una observación sobre implicaciones en el campeonato\n"
+                  "- Un cierre memorable\n\n"
+                  "NO uses emojis. Solo texto, como una narración de radio.\n\n"
+                  f"Datos de la carrera:\n{context}"
+              )}]
+          )
+
+          comentario = message.content[0].text
+
+          with open("slack_msg.txt", "a") as f:
+              f.write("\n------------------------------------------------------\n")
+              f.write(f"  _{comentario}_\n")
+              f.write("------------------------------------------------------\n")
+              f.write(" _Revisa la telemetría en nuestro <https://jpradoar.grafana.net/public-dashboards/e864ea66099e4c58941ce9cf8865fec1|Dashboard de Grafana>_")
+
+          print(" Comentario generado y añadido al mensaje de Slack.")
+          print(f"\n--- COMENTARIO ---\n{comentario}\n---")
+          EOF
+
       - name: Commit y Push de los resultados
         run: |
           GANADOR=$(echo "${{ github.event.inputs.pos1 }}" | cut -d',' -f1 | xargs)
           git config --global user.name "Semaforo-Bot[bot]"
           git config --global user.email "semaforo-bot[bot]@users.noreply.github.com"
           git add datos_carreras/
-          git commit -m "📊 Resultado: ${{ github.event.inputs.pista }} | Ganador: $GANADOR"
+          git commit -m " Resultado: ${{ github.event.inputs.pista }} | Ganador: $GANADOR"
           git push
 
-      - name: 📢 Notificar a Slack
+      - name: Notificar a Slack
         run: |
           # Formateamos el mensaje de forma segura para JSON
           PAYLOAD=$(jq -n --arg text "$(cat slack_msg.txt)" '{text: $text}')
-          
+
           # Enviamos el POST al Webhook (Si existe el secreto)
           if [ "${{ secrets.SLACK_WEBHOOK }}" != "" ]; then
             curl -X POST -H 'Content-type: application/json' --data "$PAYLOAD" ${{ secrets.SLACK_WEBHOOK }}
           else
-            echo "⚠️ No se ha configurado SLACK_WEBHOOK en los secrets del repositorio."
+            echo " No se ha configurado SLACK_WEBHOOK en los secrets del repositorio."
           fi
