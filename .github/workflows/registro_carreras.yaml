@@ -303,7 +303,7 @@ jobs:
               )}]
           )
 
-          comentario = message.content[0].text
+          comentario = next(block.text for block in message.content if block.type == "text")
 
           with open("slack_msg.txt", "a") as f:
               f.write("\n------------------------------------------------------\n")
