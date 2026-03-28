@@ -231,7 +231,7 @@ jobs:
               # Añadir igualmente el link de Grafana al mensaje
               with open("slack_msg.txt", "a") as f:
                   f.write("\n------------------------------------------------------\n")
-                  f.write(" _Revisa la telemetría en nuestro <https://jpradoar.grafana.net/public-dashboards/e864ea66099e4c58941ce9cf8865fec1|Dashboard de Grafana>_")
+                  f.write(" _Revisa la telemetría en nuestro <https://jpradoar.grafana.net/public-dashboards/4b359d53cd6c465b93d9f324ea53790a|Dashboard de Grafana>_")
               exit(0)
 
           # Leer contexto ELO pre-carrera
