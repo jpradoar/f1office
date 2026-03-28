@@ -318,7 +318,7 @@ jobs:
 
           with open("slack_msg.txt", "a") as f:
               f.write("\n------------------------------------------------------\n")
-              f.write(f"  _{comentario}_\n")
+              f.write(f"  {comentario} \n")
               f.write("------------------------------------------------------\n")
               f.write(" _Revisa la telemetría en nuestro <https://jpradoar.grafana.net/public-dashboards/e864ea66099e4c58941ce9cf8865fec1|Dashboard de Grafana>_")
 
