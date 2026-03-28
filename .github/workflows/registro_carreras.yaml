@@ -303,7 +303,18 @@ jobs:
               )}]
           )
 
-          comentario = next(block.text for block in message.content if block.type == "text")
+          # Debug: mostrar estructura de la respuesta
+          print(f"Total bloques en respuesta: {len(message.content)}")
+          for i, blk in enumerate(message.content):
+              print(f"  Bloque {i}: type={getattr(blk, 'type', '?')} | tiene .text={hasattr(blk, 'text')}")
+
+          # Tomar el primer bloque que tenga texto, sin importar el type
+          comentario = next(
+              (getattr(blk, 'text', None) for blk in message.content if getattr(blk, 'text', None)),
+              None
+          )
+          if not comentario:
+              comentario = "Carrera completada. Sin comentario disponible."
 
           with open("slack_msg.txt", "a") as f:
               f.write("\n------------------------------------------------------\n")
