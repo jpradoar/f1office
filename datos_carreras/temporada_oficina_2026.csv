@@ -5,3 +5,9 @@ fecha,campeonato,pista,piloto,equipo,posicion,puntos,tiempo
 2026-03-12T21:30:53Z,temporada_oficina_2026,ovalo,ana,RANDOM,4,3,+1.379s
 2026-03-12T21:30:53Z,temporada_oficina_2026,ovalo,juan,RANDOM,5,2,+1.796s
 2026-03-12T21:30:53Z,temporada_oficina_2026,ovalo,leo,RANDOM,6,1,+2.060s
+2026-03-28T17:49:59Z,temporada_oficina_2026,ovalo,jony,INFRA,1,6,02:10:119
+2026-03-28T17:49:59Z,temporada_oficina_2026,ovalo,salva,QA,2,5,+0.492s
+2026-03-28T17:49:59Z,temporada_oficina_2026,ovalo,carlos,QA,3,4,+1.005s
+2026-03-28T17:49:59Z,temporada_oficina_2026,ovalo,ana,RANDOM,4,3,+1.296s
+2026-03-28T17:49:59Z,temporada_oficina_2026,ovalo,juan,RANDOM,5,2,+1.817s
+2026-03-28T17:49:59Z,temporada_oficina_2026,ovalo,leo,RANDOM,6,1,+2.468s
