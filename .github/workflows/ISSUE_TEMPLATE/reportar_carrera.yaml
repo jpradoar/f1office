@@ -1,5 +1,6 @@
-name: "🏎️ Reportar Resultado de Carrera"
-description: "Registra los resultados de una carrera para actualizar el campeonato y el ELO"
+---
+name: 🏎️ Reportar Resultado de Carrera
+description: Registra los resultados de una carrera para actualizar el campeonato y el ELO
 title: "[CARRERA] "
 labels: ["carrera-pendiente"]
 body:
